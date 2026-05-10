@@ -1,10 +1,11 @@
 import { adminDb } from '@/lib/firebase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const data = await req.json();
-    const patientRef = adminDb.collection('patients').doc(params.id);
+    const patientRef = adminDb.collection('patients').doc(id);
     
     await patientRef.update(data);
     
@@ -15,9 +16,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 }
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const patientRef = adminDb.collection('patients').doc(params.id);
+    const { id } = await params;
+    const patientRef = adminDb.collection('patients').doc(id);
     const snapshot = await patientRef.get();
     
     if (!snapshot.exists) {
